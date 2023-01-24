@@ -1,6 +1,6 @@
 package br.com.itstoony.libraryapi.api.resource;
 
-import br.com.itstoony.libraryapi.api.dto.BookDto;
+import br.com.itstoony.libraryapi.api.dto.BookDTO;
 import br.com.itstoony.libraryapi.api.model.entity.Book;
 import br.com.itstoony.libraryapi.exception.BusinessException;
 import br.com.itstoony.libraryapi.service.BookService;
@@ -45,7 +45,7 @@ public class BookControllerTest {
     @DisplayName("Deve criar um livro com sucesso.")
     public void createBookTest() throws Exception {
 
-        BookDto dto = createNewBook();
+        BookDTO dto = createNewBook();
 
         var savedBook = Book.builder()
                 .id(10L).author("Arthur")
@@ -73,8 +73,8 @@ public class BookControllerTest {
 
     }
 
-    private static BookDto createNewBook() {
-        return BookDto.builder()
+    private static BookDTO createNewBook() {
+        return BookDTO.builder()
                 .author("Arthur")
                 .title("As aventuras")
                 .isbn("001")
@@ -85,7 +85,7 @@ public class BookControllerTest {
     @DisplayName("Deve lançar erro de validação quando não houver dados suficientes para criação do livro")
     public void createInvalidBookTest() throws Exception {
 
-        String json = new ObjectMapper().writeValueAsString(new BookDto());
+        String json = new ObjectMapper().writeValueAsString(new BookDTO());
 
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
                 .post(BOOK_API)
@@ -138,7 +138,7 @@ public class BookControllerTest {
                 .isbn(createNewBook().getIsbn())
                 .build();
 
-        BDDMockito.given( service.getById(id) ).willReturn(Optional.of(book));
+        BDDMockito.given(service.getById(id)).willReturn(Optional.of(book));
 
         // execution
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
@@ -159,7 +159,7 @@ public class BookControllerTest {
     @DisplayName("Should throw exception when book doesn't exist in database")
     public void bookNotFoundTest() throws Exception {
         // scenary
-        BDDMockito.given( service.getById(Mockito.anyLong()) ).willReturn(Optional.empty());
+        BDDMockito.given(service.getById(Mockito.anyLong())).willReturn(Optional.empty());
 
         // execution
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
@@ -171,5 +171,38 @@ public class BookControllerTest {
                 .andExpect(status().isNotFound());
 
     }
+
+    @Test
+    @DisplayName("Should delete a book")
+    public void deleteBookTest() throws Exception {
+        // scenary
+        BDDMockito.given(service.getById(Mockito.anyLong())).willReturn(Optional.of(Book.builder().id(1L).build()));
+
+        // execution
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .delete(BOOK_API.concat("/" + 1L));
+
+        mvc
+                .perform(request)
+                .andExpect(status().isNoContent());
+
+    }
+
+    @Test
+    @DisplayName("Should throw an exception when book doesn't exist in database")
+    public void deleteBookNotFoundTest() throws Exception {
+        // scenary
+        BDDMockito.given(service.getById(Mockito.anyLong())).willReturn(Optional.empty());
+
+        // execution
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .delete(BOOK_API.concat("/" + 1L));
+
+        mvc
+                .perform(request)
+                .andExpect(status().isNotFound());
+
+    }
+
 
 }
