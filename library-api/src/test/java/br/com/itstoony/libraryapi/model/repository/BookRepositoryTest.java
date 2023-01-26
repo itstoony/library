@@ -11,6 +11,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
@@ -27,28 +29,62 @@ public class BookRepositoryTest {
     @Test
     @DisplayName("Deve retornar verdadeiro quando existir um livro na base com o ISBN informado")
     public void returnTrueWhenIsbnExists() {
-        // cenario
+        // scenary
         String isbn = "123";
         entityManager.persist(createValidBook());
 
-        // execucao
+        // execution
         boolean exists = repository.existsByIsbn(isbn);
 
-        // verificacao
+        // verification
         assertThat(exists).isTrue();
     }
 
     @Test
     @DisplayName("Deve retornar false quando não existir um livro na base com o ISBN informado")
     public void returnTrueWhenIsbnDoesntExists() {
-        // cenario
+        // scenary
         String isbn = "123";
 
-        // execucao
+        // execution
         boolean exists = repository.existsByIsbn(isbn);
 
-        // verificacao
+        // verification
         assertThat(exists).isFalse();
+    }
+
+    @Test
+    @DisplayName("Should return an optional with a valid book by it's id")
+    public void findByIdTest() {
+        // scenary
+        Book book = createValidBook();
+
+        entityManager.persist(book);
+
+        // execution
+        Optional<Book> foundBook = repository.findById(book.getId());
+
+        // verification
+        assertThat(foundBook.isPresent()).isTrue();
+        assertThat(foundBook.get().getId()).isEqualTo(book.getId());
+        assertThat(foundBook.get().getIsbn()).isEqualTo(book.getIsbn());
+        assertThat(foundBook.get().getAuthor()).isEqualTo(book.getAuthor());
+        assertThat(foundBook.get().getTitle()).isEqualTo(book.getTitle());
+
+    }
+
+    @Test
+    @DisplayName("Should return an empty optional when book doesn't exist")
+    public void findByIdEmptyTest() {
+        // scenary
+        Long id = 1L;
+
+        // execution
+        Optional<Book> foundBook = repository.findById(id);
+
+        // validation
+        assertThat(foundBook.isEmpty()).isTrue();
+
     }
 
     private static Book createValidBook() {
