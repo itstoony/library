@@ -32,11 +32,19 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public void delete(Book book) {
+        if (book == null || book.getId() == null) {
+            throw new IllegalArgumentException("Can't delete an unsaved book");
+        }
+
         repository.delete(book);
     }
 
     @Override
     public Book update(Book book) {
+        if (book == null || book.getId() == null) {
+            throw new IllegalArgumentException("Can't update an unsaved book");
+        }
+
         return repository.save(book);
     }
 

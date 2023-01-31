@@ -1,7 +1,6 @@
 package br.com.itstoony.libraryapi.model.repository;
 
 import br.com.itstoony.libraryapi.api.model.entity.Book;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -86,6 +85,23 @@ public class BookRepositoryTest {
         assertThat(foundBook.isEmpty()).isTrue();
 
     }
+
+    @Test
+    @DisplayName("Should delete a book from database")
+    public void deleteTest() {
+        // scenary
+        Book book = createValidBook();
+
+        entityManager.persist(book);
+
+        // execution
+        repository.delete(book);
+
+        // validation
+        assertThat(repository.findById(book.getId())).isEmpty();
+
+    }
+
 
     private static Book createValidBook() {
         return Book.builder()
