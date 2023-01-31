@@ -4,6 +4,8 @@ import br.com.itstoony.libraryapi.api.model.entity.Book;
 import br.com.itstoony.libraryapi.exception.BusinessException;
 import br.com.itstoony.libraryapi.model.repository.BookRepository;
 import br.com.itstoony.libraryapi.service.BookService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -46,6 +48,11 @@ public class BookServiceImpl implements BookService {
         }
 
         return repository.save(book);
+    }
+
+    @Override
+    public Page<Book> find(Book filter, Pageable pageRequest) {
+        return null;
     }
 
 }
