@@ -3,6 +3,7 @@ package br.com.itstoony.libraryapi.api.resource;
 import br.com.itstoony.libraryapi.api.dto.LoanDTO;
 import br.com.itstoony.libraryapi.api.model.entity.Book;
 import br.com.itstoony.libraryapi.api.model.entity.Loan;
+import br.com.itstoony.libraryapi.exception.BusinessException;
 import br.com.itstoony.libraryapi.service.BookService;
 import br.com.itstoony.libraryapi.service.LoanService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,6 +26,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
@@ -103,6 +105,37 @@ public class LoanControllerTest {
                 .perform(request)
                 .andExpect( status().isBadRequest() )
                 .andExpect( jsonPath("errors[0]").value("Book not found for passed isbn"));
+
+    }
+
+    @Test
+    @DisplayName("Should throw an exception when trying to loan a loaned book")
+    public void loanedBookErrorOnCreateLoanTest() throws Exception {
+        // scenary
+        LoanDTO dto = LoanDTO.builder()
+                .isbn("123")
+                .costumer("Manoel Gomes")
+                .build();
+        String json = new ObjectMapper().writeValueAsString(dto);
+
+        Book book = createValidBook();
+
+        BDDMockito.given( bookService.getBookByIsbn(dto.getIsbn()) ).willReturn( Optional.of(book) );
+        BDDMockito.given( loanService.save(Mockito.any(Loan.class))).willThrow( new BusinessException("Book already loaned") );
+
+        // execution
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .post(LOAN_API)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        // verification
+        mvc
+                .perform(request)
+                .andExpect( status().isBadRequest() )
+                .andExpect( jsonPath("errors", hasSize(1)))
+                .andExpect( jsonPath("errors[0]").value("Book already loaned"));
 
     }
 
