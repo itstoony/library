@@ -25,8 +25,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
@@ -77,7 +76,34 @@ public class LoanControllerTest {
         mvc
                 .perform(request)
                 .andExpect( status().isCreated() )
-                .andExpect( jsonPath("id").value(1L));
+                .andExpect( content().string("1"));
+    }
+
+    @Test
+    @DisplayName("Should throw an exception when trying to loan an invalid book")
+    public void invalidBookLoanTest() throws Exception {
+        // scenary
+        LoanDTO dto = LoanDTO.builder()
+                .isbn("123")
+                .costumer("Manoel Gomes")
+                .build();
+        String json = new ObjectMapper().writeValueAsString(dto);
+
+        BDDMockito.given( bookService.getBookByIsbn(dto.getIsbn()) ).willReturn( Optional.empty() );
+
+        // execution
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .post(LOAN_API)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        // verification
+        mvc
+                .perform(request)
+                .andExpect( status().isBadRequest() )
+                .andExpect( jsonPath("errors[0]").value("Book not found for passed isbn"));
+
     }
 
     public static Book createValidBook() {
