@@ -1,5 +1,7 @@
 package br.com.itstoony.libraryapi.api.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,12 +13,17 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Entity
 public class Loan {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String costumer;
 
+    @JsonIgnore
+    @ManyToOne
     private Book book;
 
     private LocalDate loanDate;
