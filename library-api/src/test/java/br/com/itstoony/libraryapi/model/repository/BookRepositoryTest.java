@@ -123,6 +123,37 @@ public class BookRepositoryTest {
 
     }
 
+    @Test
+    @DisplayName("Should find a book by it's isbn")
+    public void findByIsbnTest() {
+        // scenery
+        String isbn = createValidBook().getIsbn();
+
+        Book book = createValidBook();
+
+        entityManager.persist(book);
+
+        // execution
+        Optional<Book> foundBook = repository.findByIsbn(isbn);
+
+        // validation
+        assertThat(foundBook.isPresent()).isTrue();
+        assertThat(foundBook.get().getIsbn()).isEqualTo(isbn);
+    }
+
+    @Test
+    @DisplayName("Should not find a book with invalid isbn")
+    public void findByInvalidIsbnTest() {
+        // scenery
+        String isbn = createValidBook().getIsbn();
+
+        // execution
+        Optional<Book> foundBook = repository.findByIsbn(isbn);
+
+        // validation
+        assertThat( foundBook.isEmpty()).isTrue();
+    }
+
 
     private static Book createValidBook() {
         return Book.builder()
