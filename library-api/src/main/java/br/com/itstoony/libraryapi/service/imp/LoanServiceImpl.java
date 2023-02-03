@@ -1,6 +1,7 @@
 package br.com.itstoony.libraryapi.service.imp;
 
 import br.com.itstoony.libraryapi.api.model.entity.Loan;
+import br.com.itstoony.libraryapi.exception.BusinessException;
 import br.com.itstoony.libraryapi.model.repository.LoanRepository;
 import br.com.itstoony.libraryapi.service.LoanService;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,9 @@ public class LoanServiceImpl implements LoanService {
 
     @Override
     public Loan save(Loan loan) {
+        if (repository.existsByCostumerAndBookAndLoanDate(loan.getCostumer(), loan.getBook(), loan.getLoanDate())) {
+            throw new BusinessException("Book already loaned");
+        }
         return repository.save(loan);
     }
 
