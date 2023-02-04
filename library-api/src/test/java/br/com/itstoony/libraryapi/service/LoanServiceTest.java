@@ -70,7 +70,7 @@ public class LoanServiceTest {
         // scenery
         Loan loan = createLoan(new Book());
 
-        BDDMockito.given( repository.existsByCostumerAndBookAndLoanDate(loan.getCostumer(), loan.getBook(), loan.getLoanDate()) ).willReturn(true);
+        BDDMockito.given( repository.existsByBookAndNotReturned(loan.getBook())).willReturn( true );
         // execution
         Throwable exception = catchThrowable(() -> service.save(loan));
 
