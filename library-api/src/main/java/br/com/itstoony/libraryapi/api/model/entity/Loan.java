@@ -1,6 +1,5 @@
 package br.com.itstoony.libraryapi.api.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,13 +19,16 @@ public class Loan {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column
     private String costumer;
 
-    @JsonIgnore
+    @JoinColumn(name = "id_book")
     @ManyToOne
     private Book book;
 
+    @Column
     private LocalDate loanDate;
 
+    @Column
     private Boolean returned;
 }
