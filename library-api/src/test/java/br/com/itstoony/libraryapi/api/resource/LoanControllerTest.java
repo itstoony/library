@@ -1,6 +1,7 @@
 package br.com.itstoony.libraryapi.api.resource;
 
 import br.com.itstoony.libraryapi.api.dto.LoanDTO;
+import br.com.itstoony.libraryapi.api.dto.ReturnedLoanDTO;
 import br.com.itstoony.libraryapi.api.model.entity.Book;
 import br.com.itstoony.libraryapi.api.model.entity.Loan;
 import br.com.itstoony.libraryapi.exception.BusinessException;
@@ -27,6 +28,7 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
@@ -49,7 +51,7 @@ public class LoanControllerTest {
     @Test
     @DisplayName("Should create a loan")
     public void createLoanTest() throws Exception {
-        // scenary
+        // scenery
         LoanDTO dto = LoanDTO.builder()
                 .isbn("123")
                 .costumer("Manoel Gomes")
@@ -84,7 +86,7 @@ public class LoanControllerTest {
     @Test
     @DisplayName("Should throw an exception when trying to loan an invalid book")
     public void invalidBookLoanTest() throws Exception {
-        // scenary
+        // scenery
         LoanDTO dto = LoanDTO.builder()
                 .isbn("123")
                 .costumer("Manoel Gomes")
@@ -111,7 +113,7 @@ public class LoanControllerTest {
     @Test
     @DisplayName("Should throw an exception when trying to loan a loaned book")
     public void loanedBookErrorOnCreateLoanTest() throws Exception {
-        // scenary
+        // scenery
         LoanDTO dto = LoanDTO.builder()
                 .isbn("123")
                 .costumer("Manoel Gomes")
@@ -137,6 +139,75 @@ public class LoanControllerTest {
                 .andExpect( jsonPath("errors", hasSize(1)))
                 .andExpect( jsonPath("errors[0]").value("Book already loaned"));
 
+    }
+
+    @Test
+    @DisplayName("Should return a book")
+    public void returnBookTest() throws Exception {
+        // scenery
+        ReturnedLoanDTO returned = ReturnedLoanDTO.builder().returned(true).build();
+        Long id = 1L;
+        Loan loan = createValidLoan(createValidBook());
+        loan.setId(id);
+
+        String json = new ObjectMapper().writeValueAsString(returned);
+
+        BDDMockito.given( loanService.getById(id) ).willReturn(Optional.of(loan));
+        BDDMockito.given( loanService.update(Mockito.any(Loan.class)) ).willReturn(loan);
+
+        // execution
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .patch(LOAN_API.concat("/1"))
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        // verification
+        mvc
+                .perform(request)
+                .andExpect( status().isOk() )
+                .andExpect( jsonPath("returned").value("true"));
+
+        verify( loanService, Mockito.times(1) ).update(loan);
+        verify( loanService, Mockito.times(1) ).getById(id);
+
+    }
+
+    @Test
+    @DisplayName("Should not be able to return a already returned book")
+    public void returnAlreadyReturnedBookTest() throws Exception {
+        // scenery
+        // scenery
+        ReturnedLoanDTO returned = ReturnedLoanDTO.builder().returned(true).build();
+        Long id = 1L;
+        Loan loan = createValidLoan(createValidBook());
+        loan.setId(id);
+
+        String json = new ObjectMapper().writeValueAsString(returned);
+
+        BDDMockito.given( loanService.getById(id) ).willReturn(Optional.of(loan));
+        BDDMockito.given( loanService.update(Mockito.any(Loan.class)) ).willReturn(loan);
+
+        // execution
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .patch(LOAN_API.concat("/1"))
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        // verification
+        mvc
+                .perform(request)
+                .andExpect( status().isOk() )
+                .andExpect( jsonPath("returned").value("true"));
+
+    }
+
+    private Loan createValidLoan(Book book) {
+        return Loan.builder()
+                .book(book)
+                .costumer("Fulano")
+                .build();
     }
 
     public static Book createValidBook() {

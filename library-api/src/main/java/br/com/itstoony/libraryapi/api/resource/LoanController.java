@@ -1,6 +1,7 @@
 package br.com.itstoony.libraryapi.api.resource;
 
 import br.com.itstoony.libraryapi.api.dto.LoanDTO;
+import br.com.itstoony.libraryapi.api.dto.ReturnedLoanDTO;
 import br.com.itstoony.libraryapi.api.model.entity.Book;
 import br.com.itstoony.libraryapi.api.model.entity.Loan;
 import br.com.itstoony.libraryapi.service.BookService;
@@ -40,4 +41,12 @@ public class LoanController {
         return loan.getId();
     }
 
+    @PatchMapping("{id}")
+    public ReturnedLoanDTO returnBook( @PathVariable Long id, @RequestBody ReturnedLoanDTO dto ) {
+        Loan loan = service.getById(id).orElseThrow( () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Loan not found"));
+        loan.setReturned(true);
+        loan = service.update(loan);
+
+        return ReturnedLoanDTO.builder().returned(loan.getReturned()).build();
+    }
 }
