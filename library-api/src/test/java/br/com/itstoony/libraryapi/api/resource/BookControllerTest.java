@@ -61,7 +61,7 @@ public class BookControllerTest {
         String json = new ObjectMapper().writeValueAsString(dto);
 
         var request = MockMvcRequestBuilders
-                .post(BOOK_API.concat("/1"))
+                .post(BOOK_API)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(json);

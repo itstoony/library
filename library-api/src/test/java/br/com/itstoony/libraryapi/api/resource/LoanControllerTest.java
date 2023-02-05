@@ -174,9 +174,8 @@ public class LoanControllerTest {
     }
 
     @Test
-    @DisplayName("Should not be able to return a already returned book")
+    @DisplayName("Should return 404 when id passed is invalid")
     public void returnAlreadyReturnedBookTest() throws Exception {
-        // scenery
         // scenery
         ReturnedLoanDTO returned = ReturnedLoanDTO.builder().returned(true).build();
         Long id = 1L;
