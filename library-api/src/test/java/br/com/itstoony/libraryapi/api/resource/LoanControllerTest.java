@@ -202,6 +202,32 @@ public class LoanControllerTest {
 
     }
 
+    @Test
+    @DisplayName("Should throw error when trying to return invalid loan")
+    public void returnInvalidLoanTest() throws Exception {
+        // scenery
+        ReturnedLoanDTO returned = ReturnedLoanDTO.builder().returned(true).build();
+        Long id = 1L;
+        Loan loan = createValidLoan(createValidBook());
+        loan.setId(id);
+
+        String json = new ObjectMapper().writeValueAsString(returned);
+
+        BDDMockito.given( loanService.getById(id) ).willReturn(Optional.empty());
+
+        // execution
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .patch(LOAN_API.concat("/1"))
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        // verification
+        mvc
+                .perform(request)
+                .andExpect( status().isNotFound() );
+    }
+
     private Loan createValidLoan(Book book) {
         return Loan.builder()
                 .book(book)
