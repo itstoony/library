@@ -15,6 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
@@ -79,6 +80,30 @@ public class LoanServiceTest {
                         .isInstanceOf(BusinessException.class)
                         .hasMessage("Book already loaned");
         verify( repository, never() ).save(loan);
+
+    }
+
+    @Test
+    @DisplayName("Should get a loan's details by it's ID")
+    public void getLoanDetailTest() {
+        // scenery
+        Long id = 1L;
+        Book book = createValidBook();
+        Loan loan = createLoan(book);
+        loan.setId(id);
+
+        when( repository.findById(id) ).thenReturn(Optional.of(loan));
+
+        // execution
+        Optional<Loan> result = service.getById(id);
+
+        // verification
+        assertThat(result.isPresent()).isTrue();
+        assertThat(result.get().getId()).isEqualTo(id);
+        assertThat(result.get().getBook()).isEqualTo(loan.getBook());
+        assertThat(result.get().getLoanDate()).isEqualTo(loan.getLoanDate());
+        assertThat(result.get().getCostumer()).isEqualTo(loan.getCostumer());
+
     }
 
     private static Book createValidBook() {

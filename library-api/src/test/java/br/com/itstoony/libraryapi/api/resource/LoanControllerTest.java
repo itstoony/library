@@ -226,7 +226,9 @@ public class LoanControllerTest {
         mvc
                 .perform(request)
                 .andExpect( status().isNotFound() );
+
     }
+
 
     private Loan createValidLoan(Book book) {
         return Loan.builder()
