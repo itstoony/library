@@ -106,6 +106,26 @@ public class LoanServiceTest {
 
     }
 
+    @Test
+    @DisplayName("Should update a loan")
+    public void updateLoanTest() {
+        // scenery
+        Long id = 1L;
+        Book book = createValidBook();
+        Loan loan = createLoan(book);
+        loan.setId(id);
+        loan.setReturned(true);
+
+        when( repository.save(loan) ).thenReturn(loan);
+        // execution
+        Loan updatedLoan = service.update(loan);
+
+        // verification
+        assertThat(updatedLoan.getReturned()).isTrue();
+
+        verify( repository ).save(loan);
+    }
+
     private static Book createValidBook() {
         return Book.builder()
                 .author("Arthur")
