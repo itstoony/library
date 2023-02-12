@@ -8,6 +8,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -30,17 +32,31 @@ public class LoanRepositoryTest {
     @DisplayName("Should return true when loan exists in database")
     public void existsByBookAndNotReturnedTest() {
         // scenery
-        Book book = createValidBook();
-        entityManager.persist(book);
-
-        Loan loan = createLoan(book);
-        entityManager.persist(loan);
+        Loan loan = createAndPersistLoanAndBook();
 
         // execution
         boolean returned = repository.existsByBookAndNotReturned(loan.getBook());
 
         // verification
         assertThat(returned).isTrue();
+    }
+
+    @Test
+    @DisplayName("Should find loan by book's isbn or costumer")
+    public void findByBookIsbnOrCostumerTest() {
+        // scenery
+        Loan loan = createAndPersistLoanAndBook();
+
+        // execution
+        Page<Loan> result = repository.findByBookIsbnOrCostumer("123", "Fulano", PageRequest.of(0, 10));
+
+        // verification
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent()).contains(loan);
+        assertThat(result.getPageable().getPageSize()).isEqualTo(10);
+        assertThat(result.getPageable().getPageNumber()).isEqualTo(0);
+        assertThat(result.getTotalElements()).isEqualTo(1);
+
     }
 
     private static Book createValidBook() {
@@ -57,5 +73,15 @@ public class LoanRepositoryTest {
                 .book(book)
                 .loanDate(LocalDate.now())
                 .build();
+    }
+
+    private Loan createAndPersistLoanAndBook() {
+        Book book = createValidBook();
+        entityManager.persist(book);
+
+        Loan loan = createLoan(book);
+        entityManager.persist(loan);
+
+        return loan;
     }
 }
