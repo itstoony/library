@@ -1,8 +1,11 @@
 package br.com.itstoony.libraryapi.api.resource;
 
 import br.com.itstoony.libraryapi.api.dto.BookDTO;
+import br.com.itstoony.libraryapi.api.dto.LoanDTO;
 import br.com.itstoony.libraryapi.api.model.entity.Book;
+import br.com.itstoony.libraryapi.api.model.entity.Loan;
 import br.com.itstoony.libraryapi.service.BookService;
+import br.com.itstoony.libraryapi.service.LoanService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -23,6 +26,8 @@ public class BookController {
     private final ModelMapper modelMapper;
 
     private final BookService bookService;
+
+    private final LoanService loanService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -78,4 +83,23 @@ public class BookController {
         return new PageImpl<>(list, pageRequest, result.getTotalElements());
     }
 
+    @GetMapping("{id}/loans")
+    public Page<LoanDTO> loansByBook(@PathVariable Long id, Pageable pageable) {
+        Book book = bookService.getById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        Page<Loan> result = loanService.getLoansByBook(book, pageable);
+
+        List<LoanDTO> dtoList = result
+                .getContent()
+                .stream()
+                .map( loan -> {
+                    Book loanBook = loan.getBook();
+                    BookDTO bookDTO = modelMapper.map(loanBook, BookDTO.class);
+                    LoanDTO loanDTO = modelMapper.map(loan, LoanDTO.class);
+                    loanDTO.setBook(bookDTO);
+                    return loanDTO;
+                } )
+                .toList();
+
+        return new PageImpl<>(dtoList, pageable, result.getTotalElements());
+    }
 }
