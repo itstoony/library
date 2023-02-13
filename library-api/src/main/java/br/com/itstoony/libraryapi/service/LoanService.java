@@ -1,6 +1,7 @@
 package br.com.itstoony.libraryapi.service;
 
 import br.com.itstoony.libraryapi.api.dto.LoanFilterDTO;
+import br.com.itstoony.libraryapi.api.model.entity.Book;
 import br.com.itstoony.libraryapi.api.model.entity.Loan;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,4 +17,6 @@ public interface LoanService {
     Loan update(Loan loan);
 
     Page<Loan> find(LoanFilterDTO filterDTO, Pageable pageable);
+
+    Page<Loan> getLoansByBook(Book book, Pageable pageable);
 }

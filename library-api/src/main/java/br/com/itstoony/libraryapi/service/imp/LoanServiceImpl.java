@@ -1,6 +1,7 @@
 package br.com.itstoony.libraryapi.service.imp;
 
 import br.com.itstoony.libraryapi.api.dto.LoanFilterDTO;
+import br.com.itstoony.libraryapi.api.model.entity.Book;
 import br.com.itstoony.libraryapi.api.model.entity.Loan;
 import br.com.itstoony.libraryapi.exception.BusinessException;
 import br.com.itstoony.libraryapi.model.repository.LoanRepository;
@@ -41,6 +42,11 @@ public class LoanServiceImpl implements LoanService {
     @Override
     public Page<Loan> find(LoanFilterDTO filterDTO, Pageable pageable) {
         return repository.findByBookIsbnOrCostumer(filterDTO.getIsbn(), filterDTO.getCostumer(), pageable);
+    }
+
+    @Override
+    public Page<Loan> getLoansByBook(Book book, Pageable pageable) {
+        return repository.findByBook(book, pageable);
     }
 
 }
