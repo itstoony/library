@@ -26,6 +26,9 @@ public class Loan {
     @ManyToOne
     private Book book;
 
+    @Column(name = "customer_email")
+    private String customerEmail;
+
     @Column
     private LocalDate loanDate;
 
