@@ -69,7 +69,7 @@ public class LoanRepositoryTest {
 
     private static Loan createLoan(Book book) {
         return Loan.builder()
-                .costumer("Fulano")
+                .customer("Fulano")
                 .book(book)
                 .loanDate(LocalDate.now())
                 .build();

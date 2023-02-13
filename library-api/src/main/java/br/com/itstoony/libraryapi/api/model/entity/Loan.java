@@ -20,7 +20,7 @@ public class Loan {
     private Long id;
 
     @Column
-    private String costumer;
+    private String customer;
 
     @JoinColumn(name = "id_book")
     @ManyToOne

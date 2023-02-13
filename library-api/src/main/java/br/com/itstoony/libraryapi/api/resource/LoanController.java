@@ -40,7 +40,7 @@ public class LoanController {
                         new ResponseStatusException(HttpStatus.BAD_REQUEST, "Book not found for passed isbn"));
 
         Loan loan = Loan.builder()
-                .costumer(dto.getCostumer())
+                .customer(dto.getCustomer())
                 .book(book)
                 .loanDate(LocalDate.now())
                 .build();

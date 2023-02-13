@@ -56,7 +56,7 @@ public class LoanServiceTest {
                 .id(1L)
                 .book(book)
                 .loanDate(LocalDate.now())
-                .costumer("Fulano")
+                .customer("Fulano")
                 .build();
 
         when( repository.save(savingLoan) ).thenReturn( savedLoan );
@@ -66,7 +66,7 @@ public class LoanServiceTest {
 
         // verification
         assertThat(loan.getId()).isEqualTo(savedLoan.getId());
-        assertThat(loan.getCostumer()).isEqualTo(savedLoan.getCostumer());
+        assertThat(loan.getCustomer()).isEqualTo(savedLoan.getCustomer());
         assertThat(loan.getBook().getId()).isEqualTo(savedLoan.getBook().getId());
         assertThat(loan.getLoanDate()).isEqualTo(savedLoan.getLoanDate());
 
@@ -109,7 +109,7 @@ public class LoanServiceTest {
         assertThat(result.get().getId()).isEqualTo(id);
         assertThat(result.get().getBook()).isEqualTo(loan.getBook());
         assertThat(result.get().getLoanDate()).isEqualTo(loan.getLoanDate());
-        assertThat(result.get().getCostumer()).isEqualTo(loan.getCostumer());
+        assertThat(result.get().getCustomer()).isEqualTo(loan.getCustomer());
 
     }
 
@@ -181,7 +181,7 @@ public class LoanServiceTest {
 
     private static Loan createLoan(Book book) {
         return Loan.builder()
-                .costumer("Fulano")
+                .customer("Fulano")
                 .book(book)
                 .loanDate(LocalDate.now())
                 .build();
