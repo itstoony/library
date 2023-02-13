@@ -58,13 +58,13 @@ public class LoanControllerTest {
         // scenery
         LoanDTO dto = LoanDTO.builder()
                 .isbn("123")
-                .costumer("Manoel Gomes")
+                .customer("Manoel Gomes")
                 .build();
 
         String json = new ObjectMapper().writeValueAsString(dto);
         Loan loan = Loan.builder()
                 .id(1L)
-                .costumer("Manoel Gomes")
+                .customer("Manoel Gomes")
                 .book(createValidBook())
                 .loanDate(LocalDate.now())
                 .build();
@@ -93,7 +93,7 @@ public class LoanControllerTest {
         // scenery
         LoanDTO dto = LoanDTO.builder()
                 .isbn("123")
-                .costumer("Manoel Gomes")
+                .customer("Manoel Gomes")
                 .build();
         String json = new ObjectMapper().writeValueAsString(dto);
 
@@ -120,7 +120,7 @@ public class LoanControllerTest {
         // scenery
         LoanDTO dto = LoanDTO.builder()
                 .isbn("123")
-                .costumer("Manoel Gomes")
+                .customer("Manoel Gomes")
                 .build();
         String json = new ObjectMapper().writeValueAsString(dto);
 
@@ -247,7 +247,7 @@ public class LoanControllerTest {
                 .willReturn(new PageImpl<>(Collections.singletonList(loan), Pageable.ofSize(100), 1) );
 
         String queryString = String.format("?isbn=%s&customer=%s&page=0&size=10",
-                loan.getBook().getIsbn(), loan.getCostumer());
+                loan.getBook().getIsbn(), loan.getCustomer());
 
 
         // execution
@@ -269,7 +269,8 @@ public class LoanControllerTest {
     private Loan createValidLoan(Book book) {
         return Loan.builder()
                 .book(book)
-                .costumer("Fulano")
+                .customer("Fulano")
+                .customerEmail("fulano@email.com")
                 .build();
     }
 
