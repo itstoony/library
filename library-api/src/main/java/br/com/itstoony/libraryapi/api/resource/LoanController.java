@@ -8,6 +8,10 @@ import br.com.itstoony.libraryapi.api.model.entity.Book;
 import br.com.itstoony.libraryapi.api.model.entity.Loan;
 import br.com.itstoony.libraryapi.service.BookService;
 import br.com.itstoony.libraryapi.service.LoanService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -23,6 +27,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/loans")
 @RequiredArgsConstructor
+@Tag(name = "Loans", description = "API responsible for maintaining book loans.")
 public class LoanController {
 
     private final LoanService service;
@@ -33,6 +38,11 @@ public class LoanController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "borrow a book.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Successful loan."),
+            @ApiResponse(responseCode = "400", description = "Failure to take out the loan.")
+    })
     public Long create(@RequestBody LoanDTO dto) {
         Book book = bookService
                 .getBookByIsbn(dto.getIsbn())
@@ -51,6 +61,11 @@ public class LoanController {
     }
 
     @PatchMapping("{id}")
+    @Operation(summary = "Return a book.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Loan details successfully obtained."),
+            @ApiResponse(responseCode = "400", description = "Failed to get loan details.")
+    })
     public ReturnedLoanDTO returnBook( @PathVariable Long id ) {
         Loan loan = service.getById(id).orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Loan not found"));
         loan.setReturned(true);
@@ -60,6 +75,11 @@ public class LoanController {
     }
 
     @GetMapping
+    @Operation(summary = "Get loans with filters")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Find loans by parameters successfully obtained."),
+            @ApiResponse(responseCode = "400", description = "Failed to find loans by parameters.")
+    })
     public Page<LoanDTO> find(LoanFilterDTO dto, Pageable pageRequest) {
 
         Page<Loan> result = service.find(dto, pageRequest);
