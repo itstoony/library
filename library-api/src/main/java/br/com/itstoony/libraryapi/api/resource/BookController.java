@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -26,6 +27,7 @@ import java.util.List;
 @RequestMapping(path = "/api/books")
 @RequiredArgsConstructor
 @Tag(name = "Books", description = "API responsible for book management")
+@Slf4j
 public class BookController {
 
     private final ModelMapper modelMapper;
@@ -33,6 +35,7 @@ public class BookController {
     private final BookService bookService;
 
     private final LoanService loanService;
+
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -42,6 +45,7 @@ public class BookController {
             @ApiResponse(responseCode = "400", description = "Failed to create book.")
     })
     public BookDTO create(@RequestBody @Valid BookDTO dto) {
+        log.info(" creating a book for isbn: {}", dto.getIsbn());
 
         Book entity = modelMapper.map( dto, Book.class );
 
@@ -58,6 +62,7 @@ public class BookController {
             @ApiResponse(responseCode = "400", description = "Failed to get book details.")
     })
     public BookDTO get(@PathVariable Long id) {
+        log.info(" obtaining details for book id: {}", id);
         return bookService.getById(id)
                 .map( book -> modelMapper.map(book, BookDTO.class))
                 .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -71,6 +76,7 @@ public class BookController {
             @ApiResponse(responseCode = "400", description = "failed to delete book.")
     })
     public void delete(@PathVariable Long id) {
+        log.info(" deleting book of id: {}", id);
         Book book = bookService.getById(id).orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         bookService.delete(book);
     }
@@ -82,6 +88,7 @@ public class BookController {
             @ApiResponse(responseCode = "400", description = "Failed to update book.")
     })
     public BookDTO update(@PathVariable Long id, @RequestBody BookDTO dto) {
+        log.info(" updating book of id: {}", id);
         return bookService.getById(id).map( book -> {
 
             book.setAuthor(dto.getAuthor());
